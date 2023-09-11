@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/avi35rus-react/static/css/main.0a083444.css",
+    "main.js": "/avi35rus-react/static/js/main.e660044c.js",
+    "index.html": "/avi35rus-react/index.html",
+    "main.0a083444.css.map": "/avi35rus-react/static/css/main.0a083444.css.map",
+    "main.e660044c.js.map": "/avi35rus-react/static/js/main.e660044c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0a083444.css",
+    "static/js/main.e660044c.js"
+  ]
+}
