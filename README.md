@@ -1,1 +1,1 @@
-https://avi35rus-react-mkl1u5j0x-avi35rus.vercel.app/
+Ссылка на развернутое приложение: https://avi35rus-react-mkl1u5j0x-avi35rus.vercel.app/
