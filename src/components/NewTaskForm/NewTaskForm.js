@@ -13,11 +13,10 @@ const NewTaskForm = ({ create }) => {
 		const parsedSeconds = seconds === '' ? 0 : parseInt(seconds, 10)
 
 		if (task.body.trim() === '') return
-		if (parsedMinutes === '') return
 		const newTask = {
 			...task,
 			id: Date.now(),
-			deadlineInSec: parsedMinutes + parsedSeconds,
+			totalTimeInSec: parsedMinutes + parsedSeconds,
 		}
 
 		create(newTask)

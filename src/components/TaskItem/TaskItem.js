@@ -10,34 +10,44 @@ const TaskItem = ({ update, remove, task }) => {
 	const [editedTaskBody, setEditedTaskBody] = useState(task.body)
 	const [timeAgo, setTimeAgo] = useState(formatDistanceToNow(new Date(task.id), { addSuffix: true }))
 
-	const [taskTimer, setTaskTimer] = useState(task.timeUntilDeadline || 0)
+	const [taskTimer, setTaskTimer] = useState(() => {
+		const savedTime = localStorage.getItem(`task_${task.id}_timer`)
+		return savedTime ? parseInt(savedTime, 10) : 0
+	})
+
 	const [isTimerRunning, setIsTimerRunning] = useState(false)
-	const [stopTimer, setStopTimer] = useState(false)
+	const [isTimerStopping, setIsTimerStopping] = useState(false)
+
+	const updateLocalStorageTime = (newTime) => {
+		localStorage.setItem(`task_${task.id}_timer`, newTime.toString())
+	}
+
+	useEffect(() => {
+		const timePassedInterval = setInterval(() => {
+			isTimerRunning &&
+				setTaskTimer((prevTimer) => {
+					const newTimer = prevTimer + 1
+					updateLocalStorageTime(newTimer)
+					return newTimer
+				})
+		}, 1000)
+
+		if (taskTimer == task.totalTimeInSec && !isTimerStopping && !isChecked) {
+			setIsTimerRunning(false)
+			setIsTimerStopping(true)
+			clearInterval(timePassedInterval)
+		}
+
+		return () => clearInterval(timePassedInterval)
+	}, [isTimerRunning, taskTimer])
 
 	useEffect(() => {
 		const timeAgoInterval = setInterval(() => {
 			setTimeAgo(formatDistanceToNow(new Date(task.id), { addSuffix: true }))
 		}, 60000)
 
-		const timePassedInterval = setInterval(() => {
-			if (isTimerRunning) {
-				setTaskTimer((prevTimer) => prevTimer + 1)
-			}
-		}, 1000)
-
-		if (taskTimer == task.deadlineInSec && !stopTimer && !isChecked) {
-			setIsTimerRunning(false)
-			clearInterval(timePassedInterval)
-			setStopTimer(true)
-		}
-
-		update({ ...task, timeUntilDeadline: taskTimer })
-
-		return () => {
-			clearInterval(timeAgoInterval)
-			clearInterval(timePassedInterval)
-		}
-	}, [task.id, isTimerRunning, taskTimer])
+		return () => clearInterval(timeAgoInterval)
+	}, [task.id])
 
 	const handleCheckboxChange = () => {
 		setIsChecked(!isChecked)
@@ -90,7 +100,7 @@ const TaskItem = ({ update, remove, task }) => {
 					<span className="title">{task.body}</span>
 					<span className="description">
 						<button className={`icon ${isTimerRunning ? 'icon-pause' : 'icon-play'}`} onClick={toggleTimer}></button>
-						{formatTime(task.timeUntilDeadline)} / {formatTime(task.deadlineInSec)}
+						{formatTime(taskTimer)} / {formatTime(task.totalTimeInSec)}
 					</span>
 					<span className="description">created {timeAgo}</span>
 				</label>
@@ -123,7 +133,7 @@ TaskItem.propTypes = {
 	task: PropTypes.shape({
 		id: PropTypes.number.isRequired,
 		body: PropTypes.string.isRequired,
-		deadlineInSec: PropTypes.number.isRequired,
+		totalTimeInSec: PropTypes.number.isRequired,
 	}).isRequired,
 }
 
